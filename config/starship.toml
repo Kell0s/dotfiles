@@ -1,0 +1,70 @@
+# Строгий prompt в стиле Kellos (не зависит от Noctalia)
+palette = "kellos"
+add_newline = true
+
+format = '''
+[┌─](overlay)[\[](overlay)$directory[\]](overlay)$git_branch$git_status$c$golang$python$nodejs$rust$java$docker_context$cmd_duration
+[└─](overlay)$character'''
+
+[palettes.kellos]
+mauve   = "#b48efa"
+pink    = "#f5a9e0"
+overlay = "#6b5a85"
+text    = "#e0d4f5"
+red     = "#f38ba8"
+yellow  = "#f9e2af"
+green   = "#a6e3a1"
+sky     = "#94e2d5"
+blue    = "#c9adff"
+
+[directory]
+format = "[$path]($style)[$read_only]($read_only_style)"
+style = "bold mauve"
+read_only = " RO"
+truncation_length = 4
+truncate_to_repo = true
+truncation_symbol = "…/"
+
+[git_branch]
+format = '[─\[](overlay)[ $branch]($style)'
+style = "pink"
+
+[git_status]
+format = '([ $all_status$ahead_behind]($style))[\]](overlay)'
+style = "yellow"
+
+[c]
+format = '[─\[](overlay)[ $version]($style)[\]](overlay)'
+style = "sky"
+
+[golang]
+format = '[─\[](overlay)[ $version]($style)[\]](overlay)'
+style = "sky"
+
+[python]
+format = '[─\[](overlay)[ $version( \($virtualenv\))]($style)[\]](overlay)'
+style = "yellow"
+
+[nodejs]
+format = '[─\[](overlay)[ $version]($style)[\]](overlay)'
+style = "green"
+
+[rust]
+format = '[─\[](overlay)[ $version]($style)[\]](overlay)'
+style = "red"
+
+[java]
+format = '[─\[](overlay)[ $version]($style)[\]](overlay)'
+style = "red"
+
+[docker_context]
+format = '[─\[](overlay)[ $context]($style)[\]](overlay)'
+style = "blue"
+
+[cmd_duration]
+min_time = 2000
+format = '[─\[](overlay)[ $duration](yellow)[\]](overlay)'
+
+[character]
+success_symbol = "[❯](bold mauve)"
+error_symbol = "[❯](bold red)"

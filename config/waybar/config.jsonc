@@ -1,0 +1,107 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 32,
+  "spacing": 4,
+  "modules-left": [],
+  "modules-center": [
+    "clock"
+  ],
+  "modules-right": [],
+  "niri/workspaces": {
+    "format": "{index}"
+  },
+  "wlr/taskbar": {
+    "format": "{icon}",
+    "icon-size": 18,
+    "on-click": "activate",
+    "tooltip-format": "{title}"
+  },
+  "clock": {
+    "format": "{:%H:%M   %A, %d %B}",
+    "locale": "en_US.UTF-8",
+    "on-click": "qs -c kellos-music ipc call calendar toggle",
+    "tooltip": false
+  },
+  "cpu": {
+    "interval": 3,
+    "format": "",
+    "tooltip": true,
+    "tooltip-format": "Процессор: {usage}%\nЧастота: {avg_frequency} ГГц\nНагрузка: {load}",
+    "states": {
+      "warning": 60,
+      "critical": 85
+    },
+    "on-click": "kitty --class btop-float -e btop"
+  },
+  "memory": {
+    "interval": 5,
+    "format": "",
+    "tooltip-format": "Память: {used:0.1f} / {total:0.1f} ГБ ({percentage}%)\nПодкачка: {swapUsed:0.1f} / {swapTotal:0.1f} ГБ",
+    "states": {
+      "warning": 70,
+      "critical": 90
+    },
+    "on-click": "kitty --class btop-float -e btop"
+  },
+  "niri/language": {
+    "format": "{short}"
+  },
+  "pulseaudio": {
+    "format": "{icon}",
+    "format-muted": "",
+    "format-icons": {
+      "default": [
+        "",
+        "",
+        ""
+      ]
+    },
+    "tooltip-format": "Громкость: {volume}%\n{desc}",
+    "scroll-step": 5,
+    "on-click": "pavucontrol",
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+  },
+  "network": {
+    "format-wifi": "",
+    "format-ethernet": "",
+    "format-disconnected": "",
+    "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}",
+    "tooltip-format-ethernet": "{ifname}\n{ipaddr}",
+    "tooltip-format-disconnected": "Нет подключения",
+    "on-click": "nm-connection-editor"
+  },
+  "backlight": {
+    "format": "",
+    "tooltip-format": "Яркость: {percent}%\nКолёсико — изменить",
+    "on-scroll-up": "brightnessctl set +5%",
+    "on-scroll-down": "brightnessctl set 5%-"
+  },
+  "battery": {
+    "interval": 10,
+    "states": {
+      "warning": 25,
+      "critical": 10
+    },
+    "format": "{icon}",
+    "format-charging": "",
+    "format-plugged": "",
+    "format-icons": [
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "tooltip-format": "Батарея: {capacity}%\n{timeTo}",
+    "tooltip-format-charging": "Заряжается: {capacity}%\n{timeTo}",
+    "tooltip-format-plugged": "Подключено: {capacity}%"
+  },
+  "tray": {
+    "spacing": 8
+  },
+  "custom/sep-ws": {
+    "format": " ",
+    "tooltip": false
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "type": "kitty-direct",
+    "source": "/home/kellos/.config/fastfetch/fedora.png",
+    "width": 26,
+    "height": 13,
+    "padding": {
+      "top": 2,
+      "left": 3,
+      "right": 4
+    }
+  },
+  "display": {
+    "separator": "  ",
+    "color": {
+      "keys": "38;2;180;142;250",
+      "title": "38;2;245;169;224",
+      "output": "38;2;224;212;245"
+    },
+    "key": {
+      "width": 13
+    }
+  },
+  "modules": [
+    {
+      "type": "title",
+      "format": "{user-name}@{host-name}",
+      "color": {
+        "user": "38;2;245;169;224",
+        "at": "38;2;107;90;133",
+        "host": "38;2;180;142;250"
+      }
+    },
+    {
+      "type": "custom",
+      "format": "\u001b[38;2;107;90;133m\u256d\u2500\u001b[38;2;245;169;224m system"
+    },
+    {
+      "type": "os",
+      "key": "\u2502 \uf798  os",
+      "keyColor": "38;2;245;169;224",
+      "format": "{name} {version-id}"
+    },
+    {
+      "type": "kernel",
+      "key": "\u2502 \uf17c  kernel",
+      "keyColor": "38;2;245;169;224",
+      "format": "{release}"
+    },
+    {
+      "type": "wm",
+      "key": "\u2502 \uf2d2  wm",
+      "keyColor": "38;2;245;169;224"
+    },
+    {
+      "type": "terminal",
+      "key": "\u2502 \uf120  term",
+      "keyColor": "38;2;245;169;224"
+    },
+    {
+      "type": "shell",
+      "key": "\u2502 \uf0e7  shell",
+      "keyColor": "38;2;245;169;224"
+    },
+    {
+      "type": "packages",
+      "key": "\u2502 \uf187  pkgs",
+      "keyColor": "38;2;245;169;224",
+      "format": "{all}"
+    },
+    {
+      "type": "uptime",
+      "key": "\u2502 \uf017  uptime",
+      "keyColor": "38;2;245;169;224"
+    },
+    {
+      "type": "custom",
+      "format": "\u001b[38;2;107;90;133m\u251c\u2500\u001b[38;2;180;142;250m hardware"
+    },
+    {
+      "type": "cpu",
+      "key": "\u2502 \uf2db  cpu",
+      "keyColor": "38;2;180;142;250",
+      "format": "{name} ({cores-logical})"
+    },
+    {
+      "type": "gpu",
+      "key": "\u2502 \uf1b3  gpu",
+      "keyColor": "38;2;180;142;250",
+      "format": "{name}"
+    },
+    {
+      "type": "memory",
+      "key": "\u2502 \uf538  ram",
+      "keyColor": "38;2;180;142;250"
+    },
+    {
+      "type": "disk",
+      "key": "\u2502 \uf0a0  disk",
+      "keyColor": "38;2;180;142;250",
+      "folders": "/",
+      "format": "{size-used} / {size-total} ({size-percentage})"
+    },
+    {
+      "type": "battery",
+      "key": "\u2502 \uf240  bat",
+      "keyColor": "38;2;180;142;250"
+    },
+    {
+      "type": "display",
+      "key": "\u2502 \uf108  screen",
+      "keyColor": "38;2;180;142;250",
+      "format": "{width}x{height} @ {refresh-rate}Hz"
+    },
+    {
+      "type": "custom",
+      "format": "\u001b[38;2;107;90;133m\u2570\u2500"
+    },
+    "break",
+    {
+      "type": "colors",
+      "symbol": "circle",
+      "paddingLeft": 2
+    }
+  ]
+}

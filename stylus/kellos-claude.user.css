@@ -1,0 +1,106 @@
+/* ==UserStyle==
+@name           Kellos for Claude
+@namespace      kellos
+@version        1.0.0
+@description    claude.ai в фиолетовой палитре Kellos (как панель, kitty и nvim)
+@author         Kellos
+@preprocessor   default
+==/UserStyle== */
+
+@-moz-document domain("claude.ai") {
+
+  /* ---------- палитра: перекрываем переменные темы claude.ai ---------- */
+  :root, html, html[data-mode="dark"], html[data-theme], .dark, [data-theme="claude"] {
+    color-scheme: dark;
+
+    --bg-000: 262 40.2% 17.1%;   /* поля ввода, карточки   #271a3d */
+    --bg-100: 262 44% 9.8%;      /* основной фон           #160e24 */
+    --bg-200: 263 45% 7.8%;      /* боковая панель         #120b1d */
+    --bg-300: 259 43.2% 14.5%;   /*                         #1f1535 */
+    --bg-400: 262 37.6% 18.2%;   /* наведение               #2a1d40 */
+    --bg-500: 261 30.8% 25.5%;   /*                         #3b2d55 */
+
+    --text-000: 262 100% 96.3%;  /* #f3ecff */
+    --text-100: 262 62.3% 89.6%; /* #e0d4f5 */
+    --text-200: 262 36.7% 80.8%; /* #c9bce0 */
+    --text-300: 262 27.7% 72.4%; /* #b3a5cc */
+    --text-400: 263 20.9% 56.9%; /* #8c7aa8 */
+    --text-500: 264 19.3% 43.7%; /* #6b5a85 */
+
+    --accent-main-000: 261 91.5% 76.9%;  /* #b48efa */
+    --accent-main-100: 260 100% 82.7%;   /* #c4a7ff */
+    --accent-main-200: 260 80.8% 69.4%;  /* #9d72f0 */
+    --accent-main-900: 262 44% 9.8%;
+    --accent-brand:    317 79.2% 81.2%;  /* #f5a9e0 — розовый акцент */
+    --accent-secondary-000: 317 79.2% 81.2%;
+    --accent-secondary-100: 317 79.2% 81.2%;
+    --accent-secondary-200: 317 70% 72%;
+    --accent-secondary-900: 262 44% 9.8%;
+    --accent-pro-000: 261 91.5% 76.9%;
+    --accent-pro-100: 260 100% 82.7%;
+    --accent-pro-200: 260 80.8% 69.4%;
+
+    --border-100: 260 100% 82.7%;
+    --border-200: 260 100% 82.7%;
+    --border-300: 260 100% 82.7%;
+    --border-400: 260 100% 82.7%;
+
+    --oncolor-100: 262 44% 9.8%;   /* текст на лиловых кнопках — тёмный */
+    --oncolor-200: 262 44% 9.8%;
+    --oncolor-300: 262 44% 9.8%;
+
+    --danger-000: 343 81.2% 74.9%;
+    --danger-100: 343 81.2% 74.9%;
+    --danger-200: 343 70% 66%;
+    --danger-900: 343 40% 15%;
+    --success-000: 115 54.1% 76.1%;
+    --success-100: 115 54.1% 76.1%;
+    --success-200: 115 45% 66%;
+    --success-900: 115 30% 14%;
+    --warning-000: 41 86% 83.1%;
+    --warning-100: 41 86% 83.1%;
+    --warning-200: 41 75% 72%;
+    --warning-900: 41 40% 14%;
+  }
+
+  /* ---------- фон и выделение ---------- */
+  html, body { background: #160e24 !important; }
+  ::selection { background: rgba(180, 142, 250, 0.35); color: #f3ecff; }
+
+  /* ---------- код: JetBrains Mono, тёмная карточка ---------- */
+  code, pre, kbd, samp, .font-mono, [class*="font-mono"] {
+    font-family: "JetBrains Mono", ui-monospace, monospace !important;
+  }
+  pre, pre code, [class*="code-block"] {
+    background: #120b1d !important;
+    border-radius: 10px;
+  }
+  :not(pre) > code {
+    background: rgba(180, 142, 250, 0.14) !important;
+    color: #f5a9e0 !important;
+    border-radius: 5px;
+    padding: 0.1em 0.35em;
+  }
+
+  /* ---------- ссылки ---------- */
+  .font-claude-response a, .prose a, [class*="markdown"] a {
+    color: #c4a7ff !important;
+    text-decoration-color: rgba(196, 167, 255, 0.4) !important;
+  }
+  .font-claude-response a:hover, .prose a:hover, [class*="markdown"] a:hover { color: #f5a9e0 !important; }
+
+  /* ---------- скроллбары как в системе ---------- */
+  * { scrollbar-width: thin; scrollbar-color: #3b2d55 transparent; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #3b2d55; border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: #6b5a85; }
+
+  /* ---------- поле ввода: тонкая лиловая рамка в фокусе ---------- */
+  fieldset:focus-within, [contenteditable="true"]:focus-within {
+    outline: none !important;
+  }
+  fieldset:focus-within > div {
+    box-shadow: 0 0 0 1px rgba(180, 142, 250, 0.45) !important;
+  }
+}

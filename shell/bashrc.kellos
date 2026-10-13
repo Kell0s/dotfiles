@@ -1,0 +1,28 @@
+# >>> purple-prompt >>>
+PS1='\[\e[38;2;196;167;255m\]\w \[\e[38;2;245;169;224m\]❯\[\e[0m\] '
+# <<< purple-prompt <<<
+# >>> purple-extras >>>
+case ":$PATH:" in *":$HOME/go/bin:"*) ;; *) export PATH="$HOME/go/bin:$PATH";; esac
+if command -v eza >/dev/null; then
+  alias ls='eza --group-directories-first'
+  alias ll='eza -la --group-directories-first --git'
+  alias tree='eza --tree'
+fi
+if [ "$TERM" = "xterm-kitty" ] && command -v fastfetch >/dev/null && [ -z "$FASTFETCH_SHOWN" ]; then
+  export FASTFETCH_SHOWN=1
+fi
+# <<< purple-extras <<<
+# >>> starship >>>
+command -v starship >/dev/null && eval "$(starship init bash)"
+# <<< starship <<<
+# >>> ffwide >>>
+fastfetch() {
+  printf '\e[?7l'          # без переноса: что не влезло — обрезается
+  if [ "${COLUMNS:-$(tput cols)}" -ge 60 ]; then command fastfetch "$@"
+  else command fastfetch --logo-type none "$@"; fi
+  printf '\e[?7h'          # перенос обратно
+}
+# <<< ffwide <<<
+# >>> ffstart >>>
+[[ $- == *i* ]] && fastfetch
+# <<< ffstart <<<

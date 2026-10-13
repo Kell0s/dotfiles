@@ -1,0 +1,133 @@
+#!/usr/bin/env python3
+# buds — шумоподавление realme/OPPO/OnePlus наушников (протокол OPPO v1 по RFCOMM)
+#   buds anc | transparency | off   [MAC]
+#   buds status                       — последний режим (для панели)
+#   buds debug ...                    — то же, с выводом байтов
+# Протокол разобран в github.com/Gourav-Shetty/realme-buds.
+import json, os, re, socket, subprocess, sys, time
+
+STATE = os.path.expanduser("~/.config/kellos/buds.json")
+MODES = {"anc": 0x08, "transparency": 0x02, "off": 0x01}
+NAME_RX = re.compile(r"realme|oppo|oneplus|enco", re.I)
+DEBUG = False
+
+def load():
+    try:
+        return json.load(open(STATE))
+    except Exception:
+        return {}
+
+def save(st):
+    os.makedirs(os.path.dirname(STATE), exist_ok=True)
+    json.dump(st, open(STATE, "w"))
+
+def enc_len(v):
+    out = bytearray()
+    while True:
+        c = v & 0x7F; v >>= 7
+        out.append(c | 0x80 if v else c)
+        if not v:
+            return bytes(out)
+
+def packet(cmd, tid, payload):
+    inner = cmd.to_bytes(2, "little") + bytes([tid & 0xFF]) + len(payload).to_bytes(2, "little") + payload
+    return bytes([0xAA]) + enc_len(len(inner) + 2) + b"\x00\x00" + inner
+
+def battery_query(tid=0):
+    return bytes([0xAA, 0x07, 0x00, 0x00, 0x06, 0x01, tid & 0xFF, 0x00, 0x00])
+
+def find_mac():
+    out = subprocess.run(["bluetoothctl", "devices", "Connected"], capture_output=True, text=True).stdout
+    for line in out.splitlines():
+        m = re.match(r"Device\s+(\S+)\s+(.+)", line)
+        if m and NAME_RX.search(m.group(2)):
+            return m.group(1), m.group(2)
+    return None, None
+
+def open_ch(mac, ch):
+    """Подключиться к RFCOMM-каналу (с повтором, если канал ещё занят прошлым сеансом)."""
+    for attempt in range(4):
+        s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+        s.settimeout(3)
+        try:
+            s.connect((mac, ch))
+            time.sleep(0.3)
+            s.setblocking(False)
+            try:
+                while s.recv(1024):   # стартовый мусор
+                    pass
+            except BlockingIOError:
+                pass
+            s.setblocking(True)
+            return s
+        except OSError as e:
+            s.close()
+            if e.errno == 16 and attempt < 3:   # Device or resource busy
+                time.sleep(1.0)
+                continue
+            raise
+
+def xfer(s, data, wait=1.5, ch=0):
+    s.settimeout(wait)
+    s.sendall(data)
+    if DEBUG:
+        print(f"  ch{ch} TX", data.hex(" ").upper())
+    try:
+        resp = s.recv(1024)
+    except socket.timeout:
+        resp = b""
+    if DEBUG:
+        print(f"  ch{ch} RX", resp.hex(" ").upper() or "—")
+    return resp
+
+def find_session(mac, st):
+    """Найти канал, где наушники отвечают по протоколу OPPO; вернуть открытый сокет."""
+    cached = st.get("channels", {}).get(mac)
+    order = ([cached] if cached else []) + [c for c in range(1, 31) if c != cached]
+    for ch in order:
+        try:
+            s = open_ch(mac, ch)
+        except OSError:
+            continue
+        try:
+            if xfer(s, battery_query(), wait=1.0, ch=ch)[:1] == b"\xAA":
+                st.setdefault("channels", {})[mac] = ch
+                save(st)
+                return s, ch
+        except OSError:
+            pass
+        s.close()
+    return None, None
+
+def main():
+    global DEBUG
+    args = sys.argv[1:]
+    if args and args[0] == "debug":
+        DEBUG = True; args = args[1:]
+    st = load()
+    if not args or args[0] == "status":
+        print(st.get("mode", "")); return
+    mode = args[0]
+    if mode not in MODES:
+        sys.exit("использование: buds anc|transparency|off [MAC]")
+    mac, name = (args[1], args[1]) if len(args) > 1 else find_mac()
+    if not mac:
+        sys.exit("не нашёл подключённых realme/OPPO/OnePlus наушников")
+    s, ch = find_session(mac, st)
+    if not s:
+        sys.exit(f"{name}: наушники не ответили по протоколу OPPO — эта модель, похоже, не поддерживается")
+    tid = (st.get("tid", 0) + 1) & 0xFF
+    try:
+        resp = xfer(s, packet(0x0404, tid, bytes([0x01, 0x01, MODES[mode]])), ch=ch)
+    finally:
+        s.close()
+    st["tid"] = tid
+    st["mode"] = mode
+    save(st)
+    print(f"{name}: {mode}" + ("" if resp else " (ответа не было — проверь на слух)"))
+
+if __name__ == "__main__":
+    try:
+        main()
+    except OSError as e:
+        sys.exit(f"Bluetooth: {e.strerror or e}")

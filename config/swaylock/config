@@ -1,0 +1,26 @@
+image=/home/kellos/.config/niri/lockscreen.jpg
+scaling=fill
+font=JetBrains Mono
+indicator-radius=90
+indicator-thickness=7
+show-failed-attempts
+ignore-empty-password
+inside-color=160e24cc
+ring-color=b48efaff
+key-hl-color=f5a9e0ff
+bs-hl-color=f38ba8ff
+line-color=00000000
+separator-color=00000000
+text-color=e0d4f5ff
+inside-ver-color=160e24cc
+ring-ver-color=c4a7ffff
+text-ver-color=e0d4f5ff
+line-ver-color=00000000
+inside-wrong-color=160e24cc
+ring-wrong-color=f38ba8ff
+text-wrong-color=f38ba8ff
+line-wrong-color=00000000
+inside-clear-color=160e24cc
+ring-clear-color=f5a9e0ff
+text-clear-color=e0d4f5ff
+line-clear-color=00000000

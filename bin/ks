@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+# kstart — рабочее место одной командой (запускать из терминала):
+#   Throne (в трей, первым — чтобы VPN поднялся до остального)
+#   Brave │ новый терминал │ этот терминал │ Telegram │ Яндекс Музыка (и включает музыку)
+import json, os, re, shutil, subprocess, sys, time
+
+def niri(*args):
+    return subprocess.run(["niri", "msg", *args], capture_output=True, text=True).stdout
+
+def windows():
+    try:
+        return json.loads(niri("--json", "windows"))
+    except Exception:
+        return []
+
+T0 = time.time()
+def log(msg):
+    print(f"[kstart {time.time()-T0:4.1f}s] {msg}", flush=True)
+
+def act(*args):
+    subprocess.run(["niri", "msg", "action", *args], capture_output=True)
+
+def spawn(cmd):
+    subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+
+try:
+    me = json.loads(niri("--json", "focused-window"))
+except Exception:
+    me = None
+if not me:
+    sys.exit("kstart: запусти меня из терминала")
+ws = me["workspace_id"]
+ws_idx = next((w["idx"] for w in json.loads(niri("--json", "workspaces")) if w["id"] == ws), None)
+
+def wait_new(pattern, before, timeout=25):
+    rx = re.compile(pattern, re.I)
+    end = time.time() + timeout
+    while time.time() < end:
+        for w in windows():
+            if w["id"] not in before and rx.search(w.get("app_id") or ""):
+                return w["id"]
+        time.sleep(0.3)
+    return None
+
+def get(pattern, cmd, reuse=True):
+    """Взять уже открытое окно или запустить новое. Возвращает id окна."""
+    rx = re.compile(pattern, re.I)
+    ws_list = windows()
+    if reuse:
+        for w in ws_list:
+            if w["id"] != me["id"] and rx.search(w.get("app_id") or ""):
+                if w["workspace_id"] != ws and ws_idx is not None:
+                    act("move-window-to-workspace", "--window-id", str(w["id"]), "--focus", "false", str(ws_idx))
+                log(f"уже открыто: {w.get('app_id')} (id {w['id']})")
+                return w["id"]
+    if not cmd:
+        return None
+    act("focus-window", "--id", str(me["id"]))   # новые окна появляются у текущего
+    log("запускаю " + " ".join(cmd))
+    try:
+        spawn(cmd)
+    except Exception as e:
+        log(f"не смог запустить: {e}")
+        return None
+    wid = wait_new(pattern, {w["id"] for w in ws_list}, timeout=15)
+    log(f"  окно {'id ' + str(wid) if wid else 'НЕ ПОЯВИЛОСЬ (жду app_id ~ ' + pattern + ')'}")
+    return wid
+
+def telegram_cmd():
+    for c in ("Telegram", "telegram-desktop", "telegram"):
+        if shutil.which(c):
+            return [c]
+    if shutil.which("flatpak"):
+        r = subprocess.run(["flatpak", "info", "org.telegram.desktop"], capture_output=True)
+        if r.returncode == 0:
+            return ["flatpak", "run", "org.telegram.desktop"]
+    return None
+
+# Throne: просто запустить в трей, окно не нужно
+def throne_bin():
+    for c in ("Throne", "throne"):
+        if shutil.which(c):
+            return shutil.which(c)
+    out = subprocess.run(["rpm", "-ql", "throne"], capture_output=True, text=True).stdout.split()
+    return next((f for f in out if re.search(r"/(bin/[^/]+|Throne)$", f)), None)
+
+if subprocess.run(["pgrep", "-x", "-i", "throne"], capture_output=True).returncode != 0:
+    tb = throne_bin()
+    if tb:
+        log("запускаю Throne в трей")
+        spawn(["env", "QT_STYLE_OVERRIDE=kvantum", tb, "-tray"])
+        time.sleep(3)   # даём VPN подключиться
+    else:
+        log("Throne не найден")
+else:
+    log("Throne уже запущен")
+
+brave = get(r"^brave-browser$", ["brave-browser"])
+term  = get(r"^kitty$", ["kitty"], reuse=False)
+tg    = get(r"telegram", telegram_cmd())
+music = get(r"music\.yandex", ["brave-browser", "--app=https://music.yandex.ru"])
+
+order = [brave, term, me["id"], tg, music]
+i = 1
+for wid in order:
+    if wid is None:
+        continue
+    act("focus-window", "--id", str(wid))
+    act("move-column-to-index", str(i))
+    i += 1
+act("focus-window", "--id", str(me["id"]))
+log("окна расставлены" + (" — музыку включу, когда ЯМ загрузится" if music else ""))
+
+missing = [n for n, w in zip(["Brave", "терминал", "", "Telegram", "Яндекс Музыка"], order) if n and w is None]
+if missing:
+    print("kstart: не нашёл окно:", ", ".join(missing))
+    print("  открытые окна сейчас:", ", ".join(sorted({w.get("app_id") or "?" for w in windows()})))
+
+# музыка: ждём плеер ЯМ по MPRIS уже в фоне — терминал освобождается сразу
+if music and shutil.which("playerctl") and os.fork() == 0:
+    os.setsid()
+    sys.stdout = open(os.devnull, "w")
+    end = time.time() + 40
+    while time.time() < end:
+        players = subprocess.run(["playerctl", "-l"], capture_output=True, text=True).stdout.split()
+        for p in players:
+            if not re.match(r"(brave|chromium)", p):
+                continue
+            url = subprocess.run(["playerctl", "-p", p, "metadata", "xesam:url"], capture_output=True, text=True).stdout
+            if "music.yandex" in url:
+                time.sleep(1)
+                subprocess.run(["playerctl", "-p", p, "play"])
+                os._exit(0)
+        time.sleep(1)
+    os._exit(0)
