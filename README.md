@@ -1,6 +1,6 @@
 # Kellos rice
 
-Fedora 44 · **niri** · **Quickshell** · waybar · kitty · LazyVim — всё в фиолетовой палитре Kellos.
+Fedora 44 · **niri** · **Quickshell** · waybar · kitty · LazyVim — всё в фиолетовой палитре.
 
 | | |
 |---|---|
