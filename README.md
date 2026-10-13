@@ -1,5 +1,7 @@
 # Kellos rice
 
+![desktop](screenshots/desktop.png)
+
 Fedora 44 · **niri** · **Quickshell** · waybar · kitty · LazyVim — всё в фиолетовой палитре.
 
 | | |

@@ -158,3 +158,24 @@ end
 vim.api.nvim_create_autocmd("ColorScheme", { callback = kellos_hl })
 kellos_hl()
 -- <<< kellos-hl <<<
+-- >>> kellos-header >>>
+vim.api.nvim_create_autocmd("BufNewFile", {
+  pattern = { "*.c", "*.h", "*.go", "*.py" },
+  callback = function()
+    local name = vim.fn.expand("%:t")
+    local author = vim.trim(vim.fn.system("git config user.name"))
+    if author == "" or author:find("fatal") then author = "Kellos" end
+    local date = os.date("%Y-%m-%d %H:%M")
+    local lines
+    if name:match("%.py$") then
+      lines = { "# file:    " .. name, "# author:  " .. author, "# created: " .. date, "" }
+    elseif name:match("%.go$") then
+      lines = { "// file:    " .. name, "// author:  " .. author, "// created: " .. date, "" }
+    else
+      lines = { "/*", " * file:    " .. name, " * author:  " .. author, " * created: " .. date, " */", "" }
+    end
+    vim.api.nvim_buf_set_lines(0, 0, 0, false, lines)
+    vim.api.nvim_win_set_cursor(0, { #lines, 0 })
+  end,
+})
+-- <<< kellos-header <<<
