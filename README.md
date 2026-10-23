@@ -25,7 +25,7 @@ Fedora 44 · **niri** · **Quickshell** · waybar · kitty · LazyVim — всё
 
 ## Установка
 ```bash
-git clone https://github.com/<ник>/dotfiles ~/dotfiles && bash ~/dotfiles/install.sh
+git clone https://github.com/Kell0s/dotfiles ~/dotfiles && bash ~/dotfiles/install.sh
 ```
 Quickshell (`noctalia-qs`) и Throne ставятся отдельно.
 
